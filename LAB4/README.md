@@ -1,43 +1,44 @@
-
 # Báo cáo thực hành Lab 4
 
 - **Họ và tên:** Trần Hồ Quang Vinh
 - **MSSV:** 1150080082
-- **Bài thực hành:** Lab 4 
+- **Bài thực hành:** Lab 4 – Khảo sát và đánh giá bề mặt mạng bằng Nmap[cite: 1]
 
 ---
 
 ## 1. Môi trường thực hành
-- **Hệ điều hành:** Windows 10/11 Pro trên VMware Workstation (Chế độ mạng: Host-only).
-- **Công cụ sử dụng:**
-  - Python 3.12.7
-  - Wireshark / TShark 4.6.8
-  - Sysmon 15.22
-  - Autoruns 14.3
-  - Process Explorer 17.14
+- **Nền tảng ảo hóa:** VMware Workstation[cite: 2].
+- **Chế độ mạng:** Host-Only (`VMnet1` - Subnet `192.168.56.0/24`)[cite: 1, 9].
+- **Các thiết bị:**
+  - **Máy thật (Host):** Windows 11 (`192.168.56.1`)[cite: 1, 9].
+  - **Máy quét:** ubuntu Linux (`192.168.56.129`)[cite: 3, 9].
+  - **Máy đích:** Metasploitable 2 (`192.168.142.129`)[cite: 1, 9].
+- **Công cụ:** Nmap 7.99[cite: 9], xsltproc[cite: 1].
 
 ---
 
 ## 2. Cách dựng môi trường
-1. Tạo thư mục làm việc: `C:\LAB4\Downloads`, `C:\LAB4\Tools`, `C:\LAB4\Evidence`.
-2. Cài đặt Python (tích chọn `Add to PATH`), Wireshark (Npcap) và giải nén bộ công cụ Sysinternals vào thư mục `Tools`.
-3. Kích hoạt dịch vụ `Sysmon64`.
-4. Chuyển card mạng máy ảo về `Host-only` để cách ly an toàn.
-5. Xuất thông tin baseline ban đầu (OS, Defender, Firewall, Process, Network) vào thư mục `Evidence`.
+1. Import 2 máy ảo đóng gói sẵn (Kali Linux và Metasploitable 2) vào VMware[cite: 2, 3, 4].
+2. Chỉnh dải mạng `VMnet1` về `192.168.56.0/24`, bật DHCP[cite: 1].
+3. Gán card mạng của cả 2 VM sang `VMnet1 (Host-only)`[cite: 1].
+4. Tạo snapshot `Before-LAB4` cho cả hai máy[cite: 1].
+5. Khởi động hệ thống, kiểm tra IP qua `ip -br addr` / `ifconfig` và xác nhận kết nối bằng `ping -c 4` thông tuyến 100%[cite: 1, 8, 9].
 
 ---
 
-## 3. Tiến độ và kết quả các tình huống
-- **Baseline:** Thu thập trạng thái hệ thống trước khi thực hành — **PASS**
-- **Tình huống 1 (TH1):** Lập Risk Register và phân loại nguồn đe dọa — **PASS**
-- **Tình huống 2 (TH2):** Kiểm chứng phát hiện mã độc bằng chuỗi EICAR trên Windows Defender — **PASS**
-- **Tình huống 3 (TH3):** Bật Audit Logon, tạo user `lab3user`, sinh sự kiện Event 4624/4625/4648 và đổi mật khẩu — **PASS**
-- **Tình huống 4 (TH4):** Kiểm tra cơ chế persistence qua Registry và Scheduled Task — **PASS**
-- **Tình huống 5 (TH5):** Bắt gói tin dịch vụ HTTP nội bộ bằng Wireshark — **PASS**
+## 3. Tiến độ và kết quả
+- **Host Discovery (`-sn`):** Quét dải `192.168.56.0/24`, phát hiện 4 host UP — **PASS**[cite: 1, 9]
+- **TCP Port Scan (`-sT`, `-sS`):** Phát hiện chính xác 23 cổng open, so sánh tốc độ và quyền hạn giữa 2 kỹ thuật — **PASS**[cite: 1, 9]
+- **Kỹ thuật quét nâng cao (`-sF`, `-sX`, `-sN`, `-sA`):** Ghi nhận trạng thái `open|filtered` với FIN/Xmas/NULL và `unfiltered` với ACK — **PASS**[cite: 1, 9]
+- **UDP Scan (`-sU`):** Quét 20 cổng UDP phổ biến, ghi nhận các dịch vụ như DNS (53), NetBIOS (137) — **PASS**[cite: 1, 9]
+- **Service & OS Detection (`-sV`, `-O`):** Xác định phiên bản dịch vụ (vsftpd 2.3.4, Apache 2.2.8, Samba 3.X) và nhân Linux 2.6.X — **PASS**[cite: 1, 9]
+- **NSE Script:** Chạy `smb-os-discovery` nhận diện thông tin Samba; xác nhận không bị ảnh hưởng bởi lỗ hổng `smb-vuln-ms17-010` — **PASS**[cite: 1, 9]
+- **Xuất báo cáo:** Xuất thành công tệp `ket_qua.txt`, `ket_qua.xml` và chuyển sang `bao_cao.html` bằng xsltproc — **PASS**[cite: 1]
+- **Hardening:** Tắt dịch vụ `vsftpd`, quét kiểm tra cổng 21 chuyển từ `open` sang `closed` — **PASS**[cite: 1]
 
 ---
 
 ## 4. Lỗi gặp phải và cách khắc phục
-- **Chạy nhầm cmd thay vì PowerShell:** Khi dùng lệnh `Get-ChildItem` bị báo lỗi không nhận lệnh; khắc phục bằng cách gõ `powershell` để chuyển shell.
-- **Lỗi lệnh Auditpol:** Lỗi cú pháp `0x00000057` do tham số GUID không bọc dấu ngoặc kép; khắc phục bằng cách đặt tên subcategory dạng chuỗi: `auditpol /set /subcategory:"Logon" ...`.
-- **Tải nhầm gói Python MSIX:** Tải nhầm tệp `python-manager.msix` không có CLI; khắc phục bằng cách tải lại bộ cài Windows installer `python-3.12.7-amd64.exe`.
+- **Sai dải IP ban đầu:** Máy nhận dải NAT `192.168.44.0/24`[cite: 7, 8]; khắc phục bằng cách cấu hình lại VMnet1 sang `192.168.56.0/24` và restart dịch vụ mạng[cite: 1, 9].
+- **Gõ nhầm lệnh tại màn hình login:** Gõ nhầm lệnh vào mục username của Metasploitable[cite: 6]; khắc phục bằng cách nhấn Enter để đăng nhập lại với `msfadmin` / `msfadmin`[cite: 6].
+- **Dán nhầm nội dung vào terminal:** Bị lỗi `command not found`; khắc phục bằng cách dùng `Ctrl + C` để hủy và tự gõ lại lệnh chuẩn[cite: 1].
