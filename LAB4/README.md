@@ -1,9 +1,9 @@
 
-# Báo cáo thực hành Lab 3
+# Báo cáo thực hành Lab 4
 
 - **Họ và tên:** Trần Hồ Quang Vinh
 - **MSSV:** 1150080082
-- **Bài thực hành:** Lab 3 – Nhận diện và ứng phó các mối đe dọa đến an toàn thông tin
+- **Bài thực hành:** Lab 4 
 
 ---
 
@@ -19,7 +19,7 @@
 ---
 
 ## 2. Cách dựng môi trường
-1. Tạo thư mục làm việc: `C:\LAB3\Downloads`, `C:\LAB3\Tools`, `C:\LAB3\Evidence`.
+1. Tạo thư mục làm việc: `C:\LAB4\Downloads`, `C:\LAB4\Tools`, `C:\LAB4\Evidence`.
 2. Cài đặt Python (tích chọn `Add to PATH`), Wireshark (Npcap) và giải nén bộ công cụ Sysinternals vào thư mục `Tools`.
 3. Kích hoạt dịch vụ `Sysmon64`.
 4. Chuyển card mạng máy ảo về `Host-only` để cách ly an toàn.
