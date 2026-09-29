@@ -1,9 +1,9 @@
 
-# Báo cáo thực hành Lab 3
+# Báo cáo thực hành Lab 4
 
 - **Họ và tên:** Trần Hồ Quang Vinh
 - **MSSV:** 1150080082
-- **Bài thực hành:** Lab 3 – Nhận diện và ứng phó các mối đe dọa đến an toàn thông tin
+- **Bài thực hành:** Lab 4 
 
 ---
 
